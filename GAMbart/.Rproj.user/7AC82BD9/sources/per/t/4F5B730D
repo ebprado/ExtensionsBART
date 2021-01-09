@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1602346207293.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "572816135",
+    "id" : "4F5B730D",
+    "lastKnownWriteTime" : 1604495198,
+    "last_content_update" : 1604495198063,
+    "path" : "~/Documents/GitHub/MOTR-BART/GAMbart/R/GAM_BART_predict_tree.R",
+    "project_path" : "R/GAM_BART_predict_tree.R",
+    "properties" : {
+        "cursorPosition" : "130,27",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

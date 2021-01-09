@@ -1,0 +1,26 @@
+# The way the referee understood our algorithm
+set.seed(001)
+n = 100
+fx = rnorm(n, 0, 2) # sum of the trees
+w = rnorm(n, fx, 1)
+y = rbinom(n, 1, 0.5)
+z = rep(NA,n)
+z[y==0] = ifelse(w[y==0] < 0, w[y==0], 0)
+z[y==1] = ifelse(w[y==1] > 0, w[y==1], 0)
+hist(z)
+
+## The way is implemented in R
+
+z2 = rep(NA,n)
+z2[y==0] = pmin(w[y==0], 0)
+z2[y==1] = pmax(w[y==1], 0)
+hist(z2)
+
+### Albert and Chib (1993)
+
+z3 = rep(NA,n)
+ny0 = sum(y==0)
+ny1 = sum(y==1)
+z3[y==0] = rtruncnorm(ny0, a = -Inf, b=0, mean = fx[y==0], 1)
+z3[y==1] = rtruncnorm(ny1, a = 0, b=Inf, mean = fx[y==1], 1)
+hist(z3)

@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1609422325243.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "761519385",
+    "id" : "2F7C8353",
+    "lastKnownWriteTime" : 1609634500,
+    "last_content_update" : 1609634500,
+    "path" : "~/Documents/GitHub/MOTR-BART/myBART/R/modify_tree.R",
+    "project_path" : "R/modify_tree.R",
+    "properties" : {
+        "cursorPosition" : "154,33",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

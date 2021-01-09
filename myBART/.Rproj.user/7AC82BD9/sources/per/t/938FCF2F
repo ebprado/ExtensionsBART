@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1607696100215.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "174787125",
+    "id" : "938FCF2F",
+    "lastKnownWriteTime" : 1610039983,
+    "last_content_update" : 1610039984019,
+    "path" : "~/Documents/GitHub/MOTR-BART/AMBARTI/R/simulated_example_semibart.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "13,25",
+        "scrollLine" : "0",
+        "tempName" : "Untitled3"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
