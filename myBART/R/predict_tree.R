@@ -7,7 +7,6 @@ predict_mybart = function(object, newdata,
   n_its = object$npost
   y_hat_mat = matrix(NA, nrow = n_its,
                      ncol = nrow(newdata))
-  num_tress = object$num_trees
 
   # Now loop through iterations and get predictions
   for (i in 1:n_its) {
@@ -30,7 +29,7 @@ predict_mybart = function(object, newdata,
 
 } # end of predict function
 #' @export
-marginal_predict_mybart = function(object, var_marg, store_info, newdata,
+marginal_predict_mybart = function(object, var_marg, newdata,
                                type = c('all', 'median', 'mean')) {
 
   # Create holder for predicted values
@@ -39,12 +38,23 @@ marginal_predict_mybart = function(object, var_marg, store_info, newdata,
   ntrees = object$ntrees
   y_hat_mat = matrix(0, nrow = n_its,
                      ncol = nrow(newdata))
-  num_tress = object$num_trees
 
   var_marg_idx = as.character(which(names(newdata)==var_marg))
+
+  # Get which covariates are used by each tree in each MCMC iteration
+  vars_trees = matrix(NA, nrow=n_its, ncol=ntrees)
+  for (i in 1:n_its){
+    for (j in 1:ntrees){
+      aux = object$trees[[i]][[j]]$tree_matrix[,'split_variable']
+      if(length(aux) > 1){
+        vars_trees[i,j] = paste(unique(sort(aux[!is.na(aux)])), collapse = ',')
+      }
+    }
+  }
+
   # Now loop through iterations and get predictions
   for (i in 1:n_its) {
-    marginal_trees = which(store_info[i,] == var_marg_idx)
+    marginal_trees = which(vars_trees[i,] == var_marg_idx)
     # Sometimes the trees do not contain the variable we're interested in
     if (length(marginal_trees) > 0){
       # Get current set of trees
@@ -55,16 +65,6 @@ marginal_predict_mybart = function(object, var_marg, store_info, newdata,
                                       newdata,
                                       single_tree = length(curr_trees) == 1)
 
-    }
-  }
-
-  vars_trees = matrix(NA, nrow=n_its, ncol=ntrees)
-  for (i in 1:n_its){
-    for (j in 1:ntrees){
-      aux = object$trees[[i]][[j]]$tree_matrix[,'split_variable']
-      if(length(aux) > 1){
-        vars_trees[i,j] = paste(unique(sort(aux[!is.na(aux)])), collapse = ',')
-      }
     }
   }
 
@@ -94,7 +94,6 @@ predict_mybart_class = function(object,
   n_its = object$npost
   y_hat_mat = matrix(NA, nrow = n_its,
                      ncol = nrow(newdata))
-  num_tress = object$num_trees
 
   # Now loop through iterations and get predictions
   for (i in 1:n_its) {
