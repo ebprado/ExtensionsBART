@@ -39,8 +39,6 @@ marginal_predict_mybart = function(object, var_marg, newdata,
   y_hat_mat = matrix(0, nrow = n_its,
                      ncol = nrow(newdata))
 
-  var_marg_idx = as.character(which(names(newdata)==var_marg))
-
   # Get which covariates are used by each tree in each MCMC iteration
   vars_trees = matrix(NA, nrow=n_its, ncol=ntrees)
   for (i in 1:n_its){
@@ -54,7 +52,7 @@ marginal_predict_mybart = function(object, var_marg, newdata,
 
   # Now loop through iterations and get predictions
   for (i in 1:n_its) {
-    marginal_trees = which(vars_trees[i,] == var_marg_idx)
+    marginal_trees = which(vars_trees[i,] == var_marg)
     # Sometimes the trees do not contain the variable we're interested in
     if (length(marginal_trees) > 0){
       # Get current set of trees
