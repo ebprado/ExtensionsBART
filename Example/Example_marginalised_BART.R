@@ -46,8 +46,7 @@ b <- gam(y~s(X1,X2)+s(X3)+s(X4)+s(X5),data=dat)
 
 plot(b,pages=1,residuals=TRUE)  ## show partial residuals
 # zoom in on x4
-plot(b,pages=0,residuals=TRUE, select=3, main='GAM fit - marginal effect (x4)')
-
+plot(b,pages=0,residuals=TRUE, select=3, main='Friedman data: GAM fit - marginal effect of x4')
 
 # -----------------------------------------------------------------
 ## My implementation of this marginalisation (quite slow)
