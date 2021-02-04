@@ -200,25 +200,6 @@ bart = function(   x,
 #' @importFrom truncnorm 'rtruncnorm'
 #' @importFrom rmutil 'ddoublepois'
 
-# x
-# y
-# sparse = FALSE
-# ntrees = 10
-# node_min_size = 5
-# alpha = 0.95
-# beta = 2
-# nu = 3
-# lambda = 0.1
-# mu_mu = 0
-# sigma2 = 1
-# sigma2_mu = 1
-# nburn = 1000
-# npost = 1000
-# nthin = 1
-# lambda_cov = 0.4
-# nu_cov = 2
-# penalise_num_cov = FALSE
-
 cl_bart = function(x,
                    y,
                    sparse = TRUE,
@@ -298,7 +279,7 @@ cl_bart = function(x,
     # Start looping through trees
     for (j in 1:ntrees) {
 
-      current_partial_residuals = y_scale - y_hat + tree_fits_store[,j]
+      current_partial_residuals = z - y_hat + tree_fits_store[,j]
 
       # Propose a new tree via grow/change/prune/swap
       # type = sample(c('grow', 'prune', 'change', 'swap'), 1)
@@ -364,10 +345,10 @@ cl_bart = function(x,
     z = update_z(y, y_hat)
 
     # y_hat = get_predictions(curr_trees, x, single_tree = ntrees == 1)
-    sum_of_squares = sum((y_scale - y_hat)^2)
+    sum_of_squares = sum((y_scale - pnorm(y_hat))^2)
 
     # Update sigma2 (variance of the residuals)
-    sigma2 = update_sigma2(sum_of_squares, n = length(y_scale), nu, lambda)
+    sigma2 = update_sigma2(sum_of_squares, n = n, nu, lambda)
 
     # Update s = (s_1, ..., s_p), where s_p is the probability that predictor p is used to create new terminal nodes
     if (sparse == 'TRUE' & i > floor(TotIter*0.1)){

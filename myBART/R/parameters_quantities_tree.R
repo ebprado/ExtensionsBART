@@ -72,7 +72,7 @@ update_sigma2 <- function(S, n, nu, lambda){
   return(u)
 }
 
-# Update the latent variable z (MOTR-BART for classification) ---------------
+# Update the latent variable z ---------------
 
 update_z = function(y, prediction){
 
