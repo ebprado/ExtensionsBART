@@ -236,10 +236,7 @@ cl_bart = function(x,
   tree_fits_store = matrix(0, ncol = ntrees, nrow = length(y))
 
   # Scale the response target variable
-  y_mean = mean(y)
-  y_sd = sd(y)
-  y_scale = (y - y_mean)/y_sd
-  n = length(y_scale)
+  n = length(y)
   p = ncol(x)
   s = rep(1/p, p)
 
@@ -345,7 +342,7 @@ cl_bart = function(x,
     z = update_z(y, y_hat)
 
     # y_hat = get_predictions(curr_trees, x, single_tree = ntrees == 1)
-    sum_of_squares = sum((y_scale - pnorm(y_hat))^2)
+    sum_of_squares = sum((y - pnorm(y_hat))^2)
 
     # Update sigma2 (variance of the residuals)
     sigma2 = update_sigma2(sum_of_squares, n = n, nu, lambda)
@@ -360,13 +357,11 @@ cl_bart = function(x,
 
   return(list(trees = tree_store,
               sigma2 = sigma2_store*y_sd^2,
-              y_hat = y_hat_store*y_sd + y_mean,
+              y_hat = y_hat_store,
               npost = npost,
               nburn = nburn,
               nthin = nthin,
               ntrees = ntrees,
-              y_mean = y_mean,
-              y_sd = y_sd,
               var_count_store = var_count_store,
               s = s_prob_store
   ))
