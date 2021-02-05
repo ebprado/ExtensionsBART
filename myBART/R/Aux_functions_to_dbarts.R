@@ -42,19 +42,19 @@ dbarts_get_predictions <- function(tree, x) {
 filter_variable <- -1L
 filter_variable <- 4
 
-filter_trees_out <- function(trees.flat) {
+filter_trees_out <- function(trees.flat, x) {
   tree_predictions <- by(trees.flat[c("var", "value")], trees.flat$tree,
-                         function(tree.flat)
+                         function(tree.flat, x)
                          {
                            # If tree doesn't contain filter variable, return 0.
                            if (all(tree.flat$var != filter_variable))
-                             return(numeric(length(y)))
+                             return(numeric(nrow(x)))
 
                            tree <- dbarts_rebuild_tree(tree.flat)
 
                            dbarts_get_predictions(tree, x)
                          })
-  tree_predictions <- matrix(unlist(tree_predictions), nrow = length(y))
+  tree_predictions <- matrix(unlist(tree_predictions), nrow = nrow(x))
 
   rowSums(tree_predictions)
 }
@@ -63,9 +63,10 @@ filter_trees_out <- function(trees.flat) {
 # n_chains x n_samples.
 
 #' @export
-dbarts_marginal_prediction <- function(object, filter_variable){
+dbarts_marginal_prediction <- function(object, x, filter_variable){
 
   trees <- object$fit$getTrees()
+
 
   samples_list <- by(trees[c("tree", "var", "value")],
                      trees[c("chain", "sample")],
@@ -73,13 +74,13 @@ dbarts_marginal_prediction <- function(object, filter_variable){
 
   # Convert list
   samples <- array(unlist(samples_list),
-                   c(length(y), dim(samples_list)[1L], dim(samples_list)[2L]))
+                   c(nrow(x), dim(samples_list)[1L], dim(samples_list)[2L]))
 
   # permute to match stored values in bart object
   samples <- aperm(samples, c(2L, 3L, 1L))
 
   # undo dbarts' internal scaling
-  samples <- diff(range(y)) * (samples + 0.5) + min(y)
+  samples <- diff(range(object$y)) * (samples + 0.5) + min(object$y)
 
   # Take the mean of the predicted values over the chains
   samples = apply(apply(samples, c(1,3), mean),2 ,mean)
