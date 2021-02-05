@@ -36,29 +36,6 @@ dbarts_get_predictions <- function(tree, x) {
   predictions
 }
 
-# Set this to the variable you want to only require that trees contain. By
-# setting it to -1L, we can double check that the method returns the correct
-# result by including all trees.
-filter_variable <- -1L
-filter_variable <- 4
-
-filter_trees_out <- function(trees.flat, x) {
-  tree_predictions <- by(trees.flat[c("var", "value")], trees.flat$tree,
-                         function(tree.flat, x)
-                         {
-                           # If tree doesn't contain filter variable, return 0.
-                           if (all(tree.flat$var != filter_variable))
-                             return(numeric(nrow(x)))
-
-                           tree <- dbarts_rebuild_tree(tree.flat)
-
-                           dbarts_get_predictions(tree, x)
-                         })
-  tree_predictions <- matrix(unlist(tree_predictions), nrow = nrow(x))
-
-  rowSums(tree_predictions)
-}
-
 # Uses the flatted trees to get predictions and returns them as a 2-d list,
 # n_chains x n_samples.
 
@@ -67,10 +44,24 @@ dbarts_marginal_prediction <- function(object, x, filter_variable){
 
   trees <- object$fit$getTrees()
 
-
   samples_list <- by(trees[c("tree", "var", "value")],
                      trees[c("chain", "sample")],
-                     filter_trees_out)
+                     function (trees.flat) {
+                       tree_predictions <- by(trees.flat[c("var", "value")], trees.flat$tree,
+                                              function(tree.flat)
+                                              {
+                                                # If tree doesn't contain filter variable, return 0.
+                                                if (all(tree.flat$var != filter_variable))
+                                                  return(numeric(nrow(x)))
+
+                                                tree <- dbarts_rebuild_tree(tree.flat)
+
+                                                dbarts_get_predictions(tree, x)
+                                              })
+                       tree_predictions <- matrix(unlist(tree_predictions), nrow = nrow(x))
+
+                       rowSums(tree_predictions)
+                     })
 
   # Convert list
   samples <- array(unlist(samples_list),
@@ -87,3 +78,25 @@ dbarts_marginal_prediction <- function(object, x, filter_variable){
 
   return(samples)
 }
+
+# f <- function(x) {
+#   10 * sin(pi * x[,1] * x[,2]) + 20 * (x[,3] - 0.5)^2 +
+#     10 * x[,4] + 5 * x[,5]
+# }
+#
+# set.seed(99)
+# sigma <- 1.0
+# n     <- 100
+#
+# x  <- matrix(runif(n * 10), n, 10)
+# Ey <- f(x)
+# y  <- rnorm(n, Ey, sigma)
+#
+# set.seed(99)
+# bartFit <- bart2(x, y, verbose = FALSE, keepTrees = TRUE)
+# Set this to the variable you want to only require that trees contain. By
+# setting it to -1L, we can double check that the method returns the correct
+# result by including all trees.
+# filter_variable <- -1L
+# filter_variable <- 4
+# marg_pred = dbarts_marginal_prediction(bartFit, x, filter_variable)
