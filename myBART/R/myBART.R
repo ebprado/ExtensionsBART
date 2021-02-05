@@ -356,7 +356,7 @@ cl_bart = function(x,
   cat('\n') # Make sure progress bar ends on a new line
 
   return(list(trees = tree_store,
-              sigma2 = sigma2_store*y_sd^2,
+              sigma2 = sigma2_store,
               y_hat = y_hat_store,
               npost = npost,
               nburn = nburn,
