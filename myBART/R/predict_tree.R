@@ -156,9 +156,9 @@ marginal_predict_mybart_class = function(object, var_marg, newdata,
   # Sort out what to return
   out = list(vars_trees = vars_trees,
              prediction = switch(type,
-                                 all    = y_hat_mat,
-                                 mean   = apply(y_hat_mat,2,'mean'),
-                                 median = apply(y_hat_mat,2,'median')))
+                                 all    = pnorm(y_hat_mat),
+                                 mean   = apply(pnorm(y_hat_mat),2,'mean'),
+                                 median = apply(pnorm(y_hat_mat),2,'median')))
 
   return(out)
 
