@@ -129,3 +129,12 @@ get_number_distinct_cov <- function(tree){
 
   return(num_distinct_cov)
 }
+
+sample_move = function(curr_tree, i, nburn){
+  if (nrow(curr_tree$tree_matrix) == 1 || i < max(floor(0.1*nburn), 10)) {
+    type = 'grow'
+  } else {
+      type = sample(c('grow', 'prune', 'change'), 1)
+  }
+  return(type)
+}

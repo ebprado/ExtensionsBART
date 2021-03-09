@@ -145,3 +145,20 @@ get_num_cov_prior <- function(tree, lambda_cov, nu_cov, penalise_num_cov){
   return(log_prior_num_cov)
 
 }
+
+update_beta <- function(y, x, sigma2, omega_inv){
+
+  sigma_beta = solve(t(x)%*%x / sigma2 + omega_inv)
+  mu_beta = sigma_beta%*%(t(x)%*%y/sigma2)
+
+  beta_hat = rmvnorm(1,
+                     mean = mu_beta,
+                     sigma = sigma_beta)
+
+  return(t(beta_hat))
+}
+
+update_omega <- function(beta_hat, b, V, v){
+  out = riwish(v + 1, (beta_hat - b)%*%t(beta_hat - b) + V)
+  return(out)
+}

@@ -73,15 +73,17 @@ update_tree = function(y, # Target variable
                                 'swap'),  # Swap existing tree - swap splitting rules for two pairs of terminal nodes
                        curr_tree,         # The current set of trees (not required if type is stump)
                        node_min_size,     # The minimum size of a node to grow
-                       s)                 # probability vector to be used during the growing process
+                       s,                 # probability vector to be used during the growing process
+                       common_vars)       # common variables between the subsets x1 and x2
   {
 
   # Call the appropriate function to get the new tree
-  new_tree = switch(type,
-                    grow = grow_tree(X, y, curr_tree, node_min_size, s),
-                    prune = prune_tree(X, y, curr_tree),
-                    change = change_tree(X, y, curr_tree, node_min_size),
-                    swap = swap_tree(X, y, curr_tree, node_min_size))
+
+    new_tree = switch(type,
+                      grow = grow_tree(X, y, curr_tree, node_min_size, s, common_vars),
+                      prune = prune_tree(X, y, curr_tree),
+                      change = change_tree(X, y, curr_tree, node_min_size),
+                      swap = swap_tree(X, y, curr_tree, node_min_size))
 
   # Return the new tree
   return(new_tree)
@@ -90,16 +92,13 @@ update_tree = function(y, # Target variable
 
 # Grow_tree function ------------------------------------------------------
 
-grow_tree = function(X, y, curr_tree, node_min_size, s) {
-
-  # Set up holder for new tree
-  new_tree = curr_tree
+grow_tree = function(X, y, curr_tree, node_min_size, s, common_vars) {
 
   # Get the list of terminal nodes
-  terminal_nodes = as.numeric(which(new_tree$tree_matrix[,'terminal'] == 1))
+  terminal_nodes = as.numeric(which(curr_tree$tree_matrix[,'terminal'] == 1))
 
   # Find terminal node sizes
-  terminal_node_size = as.numeric(new_tree$tree_matrix[terminal_nodes,'node_size'])
+  terminal_node_size = as.numeric(curr_tree$tree_matrix[terminal_nodes,'node_size'])
 
   available_values = NULL
   max_bad_trees = 10
@@ -158,6 +157,14 @@ grow_tree = function(X, y, curr_tree, node_min_size, s) {
     if(any(as.numeric(new_tree$tree_matrix[,'node_size']) <= node_min_size)) {
       count_bad_trees = count_bad_trees + 1
     } else {
+      # Check whether the split variable is common to x1 and the current tree is a stump
+      if (split_variable %in% common_vars && length(terminal_nodes)==1){
+        s_aux = s
+        s_aux[split_variable] = 0 # set zero to the probability of the split variable that was just added in the tree, which is common to x1
+        new_tree_double_grow = grow_tree(X, y, new_tree, node_min_size, s_aux, common_vars)
+        new_tree_double_grow$var[2] = new_tree$var
+        return(new_tree_double_grow)
+      }
       bad_trees = FALSE
     }
 
