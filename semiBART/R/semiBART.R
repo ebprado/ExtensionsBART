@@ -5,7 +5,7 @@
 #' @importFrom truncnorm 'rtruncnorm'
 
 # x1 = x[,4:5]
-# x2 = x[,-c(4,5)]
+# x2 = x
 # y = y
 # sparse = FALSE
 # ntrees = 10
@@ -172,6 +172,7 @@ semibart = function(x1,
           if (type=='prune'){
             var_count[curr_trees[[j]]$var] = var_count[curr_trees[[j]]$var] - 1 } # -1 because of the intercept in X
         }
+        if(any(var_count < 0)) {stop()}
 
         # Update mu whether tree accepted or not
         curr_trees[[j]] = simulate_mu(curr_trees[[j]],
