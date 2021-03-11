@@ -117,8 +117,7 @@ semibart = function(x1,
     }
 
     # Update linear predictor -------
-    # beta_hat = update_beta(current_partial_residuals, x1, sigma2, Omega_inv)
-    beta_hat = (c(10, 5) - y_mean)/y_sd
+    beta_hat = update_beta(current_partial_residuals, x1, sigma2, Omega_inv)
     yhat_linear = x1%*%beta_hat
 
     # Update covariance matrix of the linear predictor
