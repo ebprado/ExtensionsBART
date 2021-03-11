@@ -94,12 +94,6 @@ update_tree = function(y, # Target variable
 
 grow_tree = function(X, y, curr_tree, node_min_size, s, common_vars) {
 
-  # Get the list of terminal nodes
-  terminal_nodes = as.numeric(which(curr_tree$tree_matrix[,'terminal'] == 1))
-
-  # Find terminal node sizes
-  terminal_node_size = as.numeric(curr_tree$tree_matrix[terminal_nodes,'node_size'])
-
   available_values = NULL
   max_bad_trees = 10
   count_bad_trees = 0
@@ -109,6 +103,12 @@ grow_tree = function(X, y, curr_tree, node_min_size, s, common_vars) {
 
     # Set up holder for new tree
     new_tree = curr_tree
+
+    # Get the list of terminal nodes
+    terminal_nodes = as.numeric(which(new_tree$tree_matrix[,'terminal'] == 1))
+
+    # Find terminal node sizes
+    terminal_node_size = as.numeric(new_tree$tree_matrix[terminal_nodes,'node_size'])
 
     # Add two extra rows to the tree in question
     new_tree$tree_matrix = rbind(new_tree$tree_matrix,
@@ -158,11 +158,12 @@ grow_tree = function(X, y, curr_tree, node_min_size, s, common_vars) {
       count_bad_trees = count_bad_trees + 1
     } else {
       # Check whether the split variable is common to x1
-      if (split_variable %in% common_vars){
+      if (split_variable %in% common_vars && all(s>0)){
         s_aux = s
         s_aux[split_variable] = 0 # set zero to the probability of the split variable that was just added in the tree, which is common to x1
         new_tree_double_grow = grow_tree(X, y, new_tree, node_min_size, s_aux, common_vars)
         new_tree_double_grow$var[2] = new_tree$var
+        save = new_tree$var
         return(new_tree_double_grow)
       }
       bad_trees = FALSE

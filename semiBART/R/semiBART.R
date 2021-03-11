@@ -7,7 +7,7 @@
 # x1 = x[,4:5]
 # x2 = x
 # y = y
-# sparse = TRUE
+# sparse = FALSE
 # ntrees = 50
 # node_min_size = 5
 # alpha = 0.95
@@ -17,8 +17,8 @@
 # mu_mu = 0
 # sigma2 = 1
 # sigma2_mu = 1
-# nburn = 500
-# npost = 1000
+# nburn = 100
+# npost = 100
 # nthin = 1
 
 semibart = function(x1,
