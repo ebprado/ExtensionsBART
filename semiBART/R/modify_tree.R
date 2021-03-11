@@ -82,7 +82,7 @@ update_tree = function(y, # Target variable
     new_tree = switch(type,
                       grow = grow_tree(X, y, curr_tree, node_min_size, s, common_vars),
                       prune = prune_tree(X, y, curr_tree),
-                      change = change_tree(X, y, curr_tree, node_min_size),
+                      change = change_tree(X, y, curr_tree, node_min_size, common_vars),
                       swap = swap_tree(X, y, curr_tree, node_min_size))
 
   # Return the new tree
@@ -157,8 +157,8 @@ grow_tree = function(X, y, curr_tree, node_min_size, s, common_vars) {
     if(any(as.numeric(new_tree$tree_matrix[,'node_size']) <= node_min_size)) {
       count_bad_trees = count_bad_trees + 1
     } else {
-      # Check whether the split variable is common to x1 and the current tree is a stump
-      if (split_variable %in% common_vars && length(terminal_nodes)==1){
+      # Check whether the split variable is common to x1
+      if (split_variable %in% common_vars){
         s_aux = s
         s_aux[split_variable] = 0 # set zero to the probability of the split variable that was just added in the tree, which is common to x1
         new_tree_double_grow = grow_tree(X, y, new_tree, node_min_size, s_aux, common_vars)
@@ -267,7 +267,7 @@ prune_tree = function(X, y, curr_tree) {
 
 # change_tree function ----------------------------------------------------
 
-change_tree = function(X, y, curr_tree, node_min_size) {
+change_tree = function(X, y, curr_tree, node_min_size, common_vars) {
 
   # Change a node means change out the split value and split variable of an internal node. Need to make sure that this does now produce a bad tree (i.e. zero terminal nodes)
 
@@ -335,10 +335,11 @@ change_tree = function(X, y, curr_tree, node_min_size) {
     new_tree = fill_tree_details(new_tree, X)
 
     # Store the covariate name that was used in the splitting rule of the terminal node that was just changed
-    new_tree$var = c(var_changed_node, new_split_variable)
+    new_tree$var = c(new_split_variable, var_changed_node)
 
     # Check for bad tree
-    if(any(as.numeric(new_tree$tree_matrix[terminal_nodes, 'node_size']) <= node_min_size)) {
+    if(any(as.numeric(new_tree$tree_matrix[terminal_nodes, 'node_size']) <= node_min_size) ||
+       (nrow(new_tree$tree_matrix) == 3 && new_tree$tree_matrix[1,'split_variable'] %in% common_vars)) {
       count_bad_trees = count_bad_trees + 1
     } else {
       bad_trees = FALSE

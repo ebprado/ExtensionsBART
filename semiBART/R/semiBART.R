@@ -4,10 +4,10 @@
 #' @importFrom MCMCpack 'rdirichlet' 'riwish'
 #' @importFrom truncnorm 'rtruncnorm'
 
-# x1 = x[,1:3]
-# x2 = x
+# x1 = x[,4:5]
+# x2 = x[,-c(4,5)]
 # y = y
-# sparse = TRUE
+# sparse = FALSE
 # ntrees = 10
 # node_min_size = 5
 # alpha = 0.95
@@ -17,8 +17,8 @@
 # mu_mu = 0
 # sigma2 = 1
 # sigma2_mu = 1
-# nburn = 1000
-# npost = 1000
+# nburn = 500
+# npost = 100
 # nthin = 1
 
 semibart = function(x1,
@@ -40,7 +40,8 @@ semibart = function(x1,
 
   if (class(x1) != 'data.frame' || class(x2) != 'data.frame') {stop('X1 and X2 need to be data frames.')}
 
-  x1 = as.matrix(cbind(x0 = rep(1, nrow(x1)), x1))
+  x1 = as.matrix(x1)
+  # x1 = as.matrix(cbind(x0 = rep(1, nrow(x1)), x1)) # insert an intercept
   x2 = as.matrix(x2)
 
   colnames_x1 = colnames(x1)
@@ -59,6 +60,7 @@ semibart = function(x1,
   tree_store = vector('list', store_size)
   sigma2_store = rep(NA, store_size)
   y_hat_store = matrix(NA, ncol = length(y), nrow = store_size)
+  bart_store = matrix(NA, ncol = length(y), nrow = store_size)
   var_count = rep(0, ncol(x2))
   var_count_store = matrix(0, ncol = ncol(x2), nrow = store_size)
   s_prob_store = matrix(0, ncol = ncol(x2), nrow = store_size)
@@ -80,6 +82,7 @@ semibart = function(x1,
   V = diag(p1)
   v = p1
   beta_hat = rep(0, p1)
+  current_partial_residuals = y_scale
 
   # Create a list of trees for the initial stump
   curr_trees = create_stump(num_trees = ntrees,
@@ -110,15 +113,17 @@ semibart = function(x1,
       var_count_store[curr,] = var_count
       s_prob_store[curr,] = s
       beta_store[curr,] = beta_hat
+      bart_store[curr,] = yhat_bart
     }
 
     # Update linear predictor -------
-    beta_hat = update_beta(current_partial_residuals, x1, sigma2, Omega_inv)
+    # beta_hat = update_beta(current_partial_residuals, x1, sigma2, Omega_inv)
+    beta_hat = (c(10, 5) - y_mean)/y_sd
     yhat_linear = x1%*%beta_hat
 
     # Update covariance matrix of the linear predictor
-    Omega = update_omega(beta_hat, b, V, v)
-    Omega_inv = solve(Omega)
+    # Omega = update_omega(beta_hat, b, V, v)
+    # Omega_inv = solve(Omega)
 
       # Start looping through trees
       for (j in 1:ntrees) {
@@ -126,7 +131,7 @@ semibart = function(x1,
         current_partial_residuals = y_scale - yhat_bart - yhat_linear + tree_fits_store[,j]
 
         # Propose a move (grow, prune, change, or swap)
-        type = sample_move(curr_trees[[j]], i, nburn)
+        type = sample_move(curr_trees[[j]], i, nburn, common_variables)
 
         # Generate a new tree based on the current
         new_trees[[j]] = update_tree(y = current_partial_residuals,
@@ -142,14 +147,14 @@ semibart = function(x1,
                                       current_partial_residuals,
                                       sigma2,
                                       sigma2_mu) +
-          get_tree_prior(curr_trees[[j]], alpha, beta)
+          get_tree_prior(curr_trees[[j]], alpha, beta, common_variables)
 
         # NEW TREE: compute the log of the marginalised likelihood + log of the tree prior
         l_new = tree_full_conditional(new_trees[[j]],
                                       current_partial_residuals,
                                       sigma2,
                                       sigma2_mu) +
-          get_tree_prior(new_trees[[j]], alpha, beta)
+          get_tree_prior(new_trees[[j]], alpha, beta, common_variables)
 
         # Exponentiate the results above
         a = exp(l_new - l_old)
@@ -158,8 +163,8 @@ semibart = function(x1,
           curr_trees[[j]] = new_trees[[j]]
 
           if (type =='change'){
-            var_count[curr_trees[[j]]$var[1]] = var_count[curr_trees[[j]]$var[1]] - 1
-            var_count[curr_trees[[j]]$var[2]] = var_count[curr_trees[[j]]$var[2]] + 1
+            var_count[curr_trees[[j]]$var[1]] = var_count[curr_trees[[j]]$var[1]] + 1
+            var_count[curr_trees[[j]]$var[2]] = var_count[curr_trees[[j]]$var[2]] - 1
           }
 
           if (type=='grow'){
@@ -196,13 +201,13 @@ semibart = function(x1,
     }
   } # End iterations loop
 
-  cat('\n') # Make sure progress bar ends on a new line
+    cat('\n') # Make sure progress bar ends on a new line
 
   return(list(trees = tree_store,
               sigma2 = sigma2_store*y_sd^2,
               y_hat = y_hat_store*y_sd + y_mean,
               beta_hat = beta_store*y_sd,
-              bart_hat = y_hat_store*y_sd,
+              bart_hat = bart_store*y_sd,
               npost = npost,
               nburn = nburn,
               nthin = nthin,

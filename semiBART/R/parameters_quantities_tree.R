@@ -88,7 +88,11 @@ update_z = function(y, prediction){
 
 # Get tree priors ---------------------------------------------------------
 
-  get_tree_prior = function(tree, alpha, beta) {
+get_tree_prior = function(tree, alpha, beta, common_vars) {
+  ## TEST
+  if (!is.null(tree$var)){
+    if (tree$var[1] %in% common_vars){alpha = 0.2; beta = 2}
+  }
 
   # Need to work out the depth of the tree
   # First find the level of each node, then the depth is the maximum of the level
