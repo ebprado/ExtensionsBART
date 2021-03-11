@@ -131,12 +131,13 @@ get_number_distinct_cov <- function(tree){
 }
 
 sample_move = function(curr_tree, i, nburn, common_vars){
+
   if (nrow(curr_tree$tree_matrix) == 1 || i < max(floor(0.1*nburn), 10)) {
     type = 'grow'
-    } else if (nrow(curr_tree$tree_matrix) == 3 && curr_tree$tree_matrix[1,'split_variable'] %in% common_vars){
+  } else if (nrow(curr_tree$tree_matrix) == 3 && curr_tree$tree_matrix[1,'split_variable'] %in% common_vars){
     type = 'change'
   } else {
-      type = sample(c('grow', 'prune', 'change'), 1)
+    type = sample(c('grow', 'prune', 'change'), 1)
   }
   return(type)
 }

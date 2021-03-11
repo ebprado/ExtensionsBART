@@ -162,7 +162,6 @@ grow_tree = function(X, y, curr_tree, node_min_size, s, common_vars) {
         s_aux = s
         s_aux[split_variable] = 0 # set zero to the probability of the split variable that was just added in the tree, which is common to x1
         new_tree_double_grow = grow_tree(X, y, new_tree, node_min_size, s_aux, common_vars)
-        new_tree_double_grow$var[2] = new_tree$var
         return(new_tree_double_grow)
       }
       bad_trees = FALSE

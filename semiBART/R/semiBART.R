@@ -117,12 +117,12 @@ semibart = function(x1,
     }
 
     # Update linear predictor -------
-    beta_hat = update_beta(current_partial_residuals, x1, sigma2, Omega_inv)
+    beta_hat = update_beta(y_scale - yhat_bart, x1, sigma2, Omega_inv)
     yhat_linear = x1%*%beta_hat
 
     # Update covariance matrix of the linear predictor
-    # Omega = update_omega(beta_hat, b, V, v)
-    # Omega_inv = solve(Omega)
+    Omega = update_omega(beta_hat, b, V, v)
+    Omega_inv = solve(Omega)
 
       # Start looping through trees
       for (j in 1:ntrees) {
