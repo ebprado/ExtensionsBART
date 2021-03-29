@@ -386,6 +386,9 @@ cl_semibart = function(x1,
 
     } # End loop through trees
 
+    # Update z (latent variable)
+    z = update_z(y, predictions)
+
     # Updating the final predictions
     y_hat = pnorm(yhat_linear + yhat_bart)
 
