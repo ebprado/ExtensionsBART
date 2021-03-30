@@ -386,11 +386,11 @@ cl_semibart = function(x1,
 
     } # End loop through trees
 
-    # Update z (latent variable)
-    z = update_z(y, predictions)
-
     # Updating the final predictions
     y_hat = pnorm(yhat_linear + yhat_bart)
+
+    # Update z (latent variable)
+    z = update_z(y, y_hat)
 
     # Update s = (s_1, ..., s_p), where s_p is the probability that predictor p is used to create new terminal nodes
     if (sparse == 'TRUE' & i > floor(TotIter*0.1)){
