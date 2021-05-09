@@ -36,12 +36,15 @@ semibart = function(x1,
                    sigma2_mu = 1,
                    nburn = 1000,
                    npost = 1000,
-                   nthin = 1) {
+                   nthin = 1,
+                   intercept = FALSE) {
 
   if (class(x1) != 'data.frame' || class(x2) != 'data.frame') {stop('X1 and X2 need to be data frames.')}
 
-  x1 = as.matrix(x1)
-  # x1 = as.matrix(cbind(x0 = rep(1, nrow(x1)), x1)) # insert an intercept
+  if (intercept == TRUE) {x1 = as.matrix(cbind(x0 = rep(1, nrow(x1)), x1))} # insert an intercept
+  if (intercept == FALSE) {x1 = as.matrix(x1)} # No intercept
+
+
   x2 = as.matrix(x2)
 
   colnames_x1 = colnames(x1)
