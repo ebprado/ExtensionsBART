@@ -206,6 +206,12 @@ semibart = function(x1,
 
     cat('\n') # Make sure progress bar ends on a new line
 
+    if (intercept==FALSE) {beta_hat = beta_store*y_sd}
+    if (intercept==TRUE) {
+      beta_hat = beta_store*y_sd
+       beta_hat[,1] = beta_hat[,1] + y_mean
+    }
+
   return(list(trees = tree_store,
               sigma2 = sigma2_store*y_sd^2,
               y_hat = y_hat_store*y_sd + y_mean,
