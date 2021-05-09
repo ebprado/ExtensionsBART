@@ -66,6 +66,7 @@ semibart = function(x1,
   s_prob_store = matrix(0, ncol = ncol(x2), nrow = store_size)
   tree_fits_store = matrix(0, ncol = ntrees, nrow = length(y))
   beta_store = matrix(NA, ncol = ncol(x1), nrow=store_size)
+  colnames(beta_store) = colnames_x1
 
   # Scale the response target variable
   y_mean = mean(y)
