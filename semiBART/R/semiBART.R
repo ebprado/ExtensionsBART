@@ -21,6 +21,7 @@
 # npost = 100
 # nthin = 1
 
+
 semibart = function(x1,
                    x2,
                    y,
