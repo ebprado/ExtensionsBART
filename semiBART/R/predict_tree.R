@@ -1,12 +1,15 @@
 #' @export
-predict_mybart = function(object, newdata,
+predict_semibart = function(object, newdata_x1, newdata_x2,
                          type = c('all', 'median', 'mean')) {
 
+  X1 = as.matrix(newdata_x1)
+  beta_hat = apply(object$beta_hat,2,mean)
+
   # Create holder for predicted values
-  n_newX = dim(newdata)[1]
+  n_newX = dim(newdata_x2)[1]
   n_its = object$npost
   y_hat_mat = matrix(NA, nrow = n_its,
-                     ncol = nrow(newdata))
+                     ncol = nrow(newdata_x2))
 
   # Now loop through iterations and get predictions
   for (i in 1:n_its) {
@@ -15,15 +18,15 @@ predict_mybart = function(object, newdata,
 
     # Use get_predictions function to get predictions
     y_hat_mat[i,] = get_predictions(curr_trees,
-                                    newdata,
+                                    newdata_x2,
                                     single_tree = length(curr_trees) == 1)
   }
 
   # Sort out what to return
   out = switch(type,
-               all = object$y_mean + object$y_sd * y_hat_mat,
-               mean = object$y_mean + object$y_sd * apply(y_hat_mat,2,'mean'),
-               median = object$y_mean + object$y_sd * apply(y_hat_mat,2,'median'))
+               all = X1%*%beta_hat + object$y_mean + object$y_sd * y_hat_mat,
+               mean = X1%*%beta_hat + object$y_mean + object$y_sd * apply(y_hat_mat,2,'mean'),
+               median = X1%*%beta_hat + object$y_mean + object$y_sd * apply(y_hat_mat,2,'median'))
 
   return(out)
 
