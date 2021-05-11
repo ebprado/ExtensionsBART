@@ -70,7 +70,8 @@ update_tree = function(y, # Target variable
                        type = c('grow',   # Grow existing tree
                                 'prune',  # Prune existing tree
                                 'change', # Change existing tree - change split variable and value for an internal node
-                                'swap'),  # Swap existing tree - swap splitting rules for two pairs of terminal nodes
+                                'swap',   # Swap existing tree - swap splitting rules for two pairs of terminal nodes
+                                'stump'), # set a tree back to stump
                        curr_tree,         # The current set of trees (not required if type is stump)
                        node_min_size,     # The minimum size of a node to grow
                        s,                 # probability vector to be used during the growing process
@@ -83,7 +84,8 @@ update_tree = function(y, # Target variable
                       grow = grow_tree(X, y, curr_tree, node_min_size, s, common_vars),
                       prune = prune_tree(X, y, curr_tree),
                       change = change_tree(X, y, curr_tree, node_min_size, common_vars),
-                      swap = swap_tree(X, y, curr_tree, node_min_size))
+                      swap = swap_tree(X, y, curr_tree, node_min_size),
+                      stump = create_stump(1, y, X))
 
   # Return the new tree
   return(new_tree)

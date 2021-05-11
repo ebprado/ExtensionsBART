@@ -135,7 +135,7 @@ sample_move = function(curr_tree, i, nburn, common_vars){
   if (nrow(curr_tree$tree_matrix) == 1 || i < max(floor(0.1*nburn), 10)) {
     type = 'grow'
   } else if (nrow(curr_tree$tree_matrix) == 3 && curr_tree$tree_matrix[1,'split_variable'] %in% common_vars){
-    type = sample(c('prune'), 1)
+    type = 'stump' # this condition can happen due to a previous prune step, but as soon as it happens, we set it to a stump
   } else {
     type = sample(c('grow', 'prune', 'change'), 1)
   }
