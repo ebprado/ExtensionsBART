@@ -85,7 +85,7 @@ update_tree = function(y, # Target variable
                       prune = prune_tree(X, y, curr_tree),
                       change = change_tree(X, y, curr_tree, node_min_size, common_vars),
                       swap = swap_tree(X, y, curr_tree, node_min_size),
-                      stump = create_stump(1, y, X))
+                      stump = create_stump(1, y, X)[[1]])
 
   # Return the new tree
   return(new_tree)
