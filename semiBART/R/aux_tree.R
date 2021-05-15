@@ -147,53 +147,45 @@ sample_move = function(curr_tree, i, nburn, common_vars){
 
 MakeDesignMatrix <- function(formula, data){
 
-  IsThereRandomEffects = tryCatch(
+  IsThereRandomEffects = try(
+    # When there is at least one random effect term in the formula
     {parsedFormula = lFormula(formula = formula, data = data)
-    return('Yes')},
-    error=function(err) {return('No')}
-  )
+    y_name = gsub('\\().*$', '', parsedFormula$formula[2]) # get the response variable name
+    y = data[,y_name]
+    Z = t(parsedFormula$reTrms$Zt) # design matrix for random effects
+
+    # Number of random effect terms
+    number_random_effect_terms = length(parsedFormula$reTrms$cnms)
+
+    # When there are more than one random effect term
+    if (number_random_effect_terms > 1){
+      aux_indx_ini = 1
+      aux_indx_end = 0
+      for (i in 1:number_random_effect_terms){
+        term = parsedFormula$reTrms$cnms[i]
+        term_name = names(term)
+        unique_values_cov = nrow(unique(data[,term_name]))
+        aux_indx_end = aux_indx_ini + unique_values_cov * length(term[[1]]) - 1
+        colnames(Z)[aux_indx_ini:aux_indx_end] = paste(colnames(Z)[aux_indx_ini:aux_indx_end], rep(parsedFormula$reTrms$cnms[[i]],unique_values_cov), sep='')
+        colnames(Z)[aux_indx_ini:aux_indx_end] = gsub('\\.*\\(Intercept\\)',term_name , colnames(Z)[aux_indx_ini:aux_indx_end])
+        aux_indx_ini = aux_indx_end + 1
+      }
+      X_Z = as.data.frame(as.matrix(cbind(parsedFormula$X, Z)))
+    } else {
+      colnames(Z) = paste(colnames(Z), parsedFormula$reTrms$cnms[[1]], sep='')
+      colnames(Z) = gsub('\\.*\\(Intercept\\)', names(parsedFormula$reTrms$cnms), colnames(Z))
+      X_Z = as.data.frame(as.matrix(cbind(parsedFormula$X, Z)))
+    }
+    return(list(y = y,
+                X = X_Z))})
 
   # When there is no random effect terms (only fixed effects)
-  if (IsThereRandomEffects == 'No') {
-    X <- model.frame(formula = formula, data = data)
+  if (is.na(IsThereRandomEffects[2])) {
+    X <- model.frame(formula = paste('~', formula[3]), data = data)
     X <- makeModelMatrixFromDataFrame(X, drop = FALSE)
     y_name = gsub('\\().*$', '', formula[2]) # get the response variable name
     y = data[,y_name]
     return(list(y = y,
                 X = X))
   }
-
-# When there is at least one random effect term in the formula
-if (IsThereRandomEffects == 'Yes') {
-  parsedFormula = lFormula(formula = formula, data = data)
-  y_name = gsub('\\().*$', '', parsedFormula$formula[2]) # get the response variable name
-  y = data[,y_name]
-  Z = t(parsedFormula$reTrms$Zt) # design matrix for random effects
-
-  # Number of random effect terms
-  number_random_effect_terms = length(parsedFormula$reTrms$cnms)
-
-  # When there are more than one random effect term
-  if (number_random_effect_terms > 1){
-    aux_indx_ini = 1
-    aux_indx_end = 0
-    for (i in 1:number_random_effect_terms){
-      term = parsedFormula$reTrms$cnms[i]
-      term_name = names(term)
-      unique_values_cov = nrow(unique(data[,term_name]))
-      aux_indx_end = aux_indx_ini + unique_values_cov * length(term[[1]]) - 1
-      colnames(Z)[aux_indx_ini:aux_indx_end] = paste(colnames(Z)[aux_indx_ini:aux_indx_end], rep(parsedFormula$reTrms$cnms[[i]],unique_values_cov), sep='')
-      colnames(Z)[aux_indx_ini:aux_indx_end] = gsub('\\.*\\(Intercept\\)',term_name , colnames(Z)[aux_indx_ini:aux_indx_end])
-      aux_indx_ini = aux_indx_end + 1
-    }
-    X_Z = as.data.frame(as.matrix(cbind(parsedFormula$X, Z)))
-  } else {
-    colnames(Z) = paste(colnames(Z), parsedFormula$reTrms$cnms[[1]], sep='')
-    colnames(Z) = gsub('\\.*\\(Intercept\\)', names(parsedFormula$reTrms$cnms), colnames(Z))
-    X_Z = as.data.frame(as.matrix(cbind(parsedFormula$X, Z)))
-  }
-}
-
-return(list(y = y,
-            X = X_Z))
 }
