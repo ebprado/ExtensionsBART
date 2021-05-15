@@ -10,6 +10,7 @@
 # 5. get_ancestors: get the ancestors of all terminal nodes in a tree
 # 6. update_s: full conditional of the vector of splitting probability.
 # 7. get_number_distinct_cov: given a tree, it returns the number of distinct covariates used to create its structure
+# 8. MakeDesignMatrix: it's a function that creates the design matrix for the linear based on the formula
 
 # Fill_tree_details -------------------------------------------------------
 
@@ -140,4 +141,40 @@ sample_move = function(curr_tree, i, nburn, common_vars){
     type = sample(c('grow', 'prune', 'change'), 1)
   }
   return(type)
+}
+
+## ---------------------------------------------------
+
+MakeDesignMatrix <- function(formula, data){
+
+  parsedFormula = lFormula(formula = formula, data = data)
+  y_name = gsub('\\().*$', '', parsedFormula$formula[2]) # get the response variable name
+  y = data[,y_name]
+  Z = t(parsedFormula$reTrms$Zt) # design matrix for random effects
+
+  # Number of random effect terms
+  number_random_effect_terms = length(parsedFormula$reTrms$cnms)
+
+  # When there are more than one random effect term
+  if (number_random_effect_terms > 1){
+    aux_indx_ini = 1
+    aux_indx_end = 0
+    for (i in 1:number_random_effect_terms){
+      term = parsedFormula$reTrms$cnms[i]
+      term_name = names(term)
+      unique_values_cov = nrow(unique(data[,term_name]))
+      aux_indx_end = aux_indx_ini + unique_values_cov * length(term[[1]]) - 1
+      colnames(Z)[aux_indx_ini:aux_indx_end] = paste(colnames(Z)[aux_indx_ini:aux_indx_end], rep(parsedFormula$reTrms$cnms[[i]],unique_values_cov), sep='')
+      colnames(Z)[aux_indx_ini:aux_indx_end] = gsub('\\.*\\(Intercept\\)',term_name , colnames(Z)[aux_indx_ini:aux_indx_end])
+      aux_indx_ini = aux_indx_end + 1
+    }
+    X_Z = as.data.frame(as.matrix(cbind(parsedFormula$X, Z)))
+  } else {
+    colnames(Z) = paste(colnames(Z), parsedFormula$reTrms$cnms[[1]], sep='')
+    colnames(Z) = gsub('\\.*\\(Intercept\\)', names(parsedFormula$reTrms$cnms), colnames(Z))
+    X_Z = as.data.frame(as.matrix(cbind(parsedFormula$X, Z)))
+
+  }
+  return(list(y = y,
+              X = X_Z))
 }

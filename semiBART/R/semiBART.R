@@ -3,6 +3,7 @@
 #' @importFrom stats 'rgamma' 'runif' 'dnorm' 'sd' 'rnorm' 'pnorm' 'aggregate'
 #' @importFrom MCMCpack 'rdirichlet' 'riwish'
 #' @importFrom truncnorm 'rtruncnorm'
+#' @importFrom lme4 'lFormula'
 #'
 # x1 = x[,4:5]
 # x2 = x
@@ -22,9 +23,9 @@
 # nthin = 1
 
 
-semibart = function(x1,
-                   x2,
-                   y,
+semibart = function(formula,
+                   x1, # it needs to contain the response
+                   x2, # it doesn't need to contain the response
                    sparse = TRUE,
                    ntrees = 10,
                    node_min_size = 5,
@@ -42,11 +43,10 @@ semibart = function(x1,
 
   if (class(x1) != 'data.frame' || class(x2) != 'data.frame') {stop('X1 and X2 need to be data frames.')}
 
-  if (intercept == TRUE) {x1 = as.matrix(cbind(x0 = rep(1, nrow(x1)), x1))} # insert an intercept
-  if (intercept == FALSE) {x1 = as.matrix(x1)} # No intercept
-
-
-  x2 = as.matrix(x2)
+  data = MakeDesignMatrix(formula, x1)
+  y = data$y
+  x1 = as.matrix(data$X) # matrix to be used in the linear predictor
+  x2 = as.matrix(x2) # matrix to be used in the BART component
 
   colnames_x1 = colnames(x1)
   colnames_x2 = colnames(x2)
@@ -172,10 +172,10 @@ semibart = function(x1,
           }
 
           if (type=='grow'){
-            var_count[curr_trees[[j]]$var] = var_count[curr_trees[[j]]$var] + 1 } # -1 because of the intercept in X
+            var_count[curr_trees[[j]]$var] = var_count[curr_trees[[j]]$var] + 1 }
 
           if (type=='prune'){
-            var_count[curr_trees[[j]]$var] = var_count[curr_trees[[j]]$var] - 1 } # -1 because of the intercept in X
+            var_count[curr_trees[[j]]$var] = var_count[curr_trees[[j]]$var] - 1 }
         }
 
         # Update mu whether tree accepted or not
@@ -225,8 +225,8 @@ semibart = function(x1,
               y_mean = y_mean,
               y_sd = y_sd,
               var_count_store = var_count_store,
-              s = s_prob_store
-              ))
+              s = s_prob_store,
+              formula = formula))
 
 } # End main function
 
