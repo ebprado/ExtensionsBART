@@ -1,6 +1,6 @@
 #' @export
 #' @importFrom mvtnorm 'rmvnorm'
-#' @importFrom stats 'rgamma' 'runif' 'dnorm' 'sd' 'rnorm' 'pnorm' 'aggregate'
+#' @importFrom stats 'rgamma' 'runif' 'dnorm' 'sd' 'rnorm' 'pnorm' 'aggregate' 'as.formula'
 #' @importFrom MCMCpack 'rdirichlet' 'riwish'
 #' @importFrom truncnorm 'rtruncnorm'
 #' @importFrom lme4 'lFormula'
@@ -43,6 +43,7 @@ semibart = function(formula,
 
   if (class(x1) != 'data.frame' || class(x2) != 'data.frame') {stop('X1 and X2 need to be data frames.')}
 
+  formula = as.formula(formula)
   data = MakeDesignMatrix(formula, x1)
   y = data$y
   x1 = as.matrix(data$X) # matrix to be used in the linear predictor
