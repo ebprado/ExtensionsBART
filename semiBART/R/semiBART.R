@@ -1,9 +1,10 @@
 #' @export
 #' @importFrom mvtnorm 'rmvnorm'
-#' @importFrom stats 'rgamma' 'runif' 'dnorm' 'sd' 'rnorm' 'pnorm' 'aggregate' 'as.formula'
+#' @importFrom stats 'rgamma' 'runif' 'dnorm' 'sd' 'rnorm' 'pnorm' 'aggregate' 'as.formula' 'model.frame'
 #' @importFrom MCMCpack 'rdirichlet' 'riwish'
 #' @importFrom truncnorm 'rtruncnorm'
 #' @importFrom lme4 'lFormula'
+#' @importFrom dbarts 'makeModelMatrixFromDataFrame'
 #'
 # x1 = x[,4:5]
 # x2 = x

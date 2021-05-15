@@ -147,6 +147,24 @@ sample_move = function(curr_tree, i, nburn, common_vars){
 
 MakeDesignMatrix <- function(formula, data){
 
+  IsThereRandomEffects = tryCatch(
+    {parsedFormula = lFormula(formula = formula, data = data)
+    return('Yes')},
+    error=function(err) {return('No')}
+  )
+
+  # When there is no random effect terms (only fixed effects)
+  if (IsThereRandomEffects == 'No') {
+    X <- model.frame(formula = formula, data = data)
+    X <- makeModelMatrixFromDataFrame(X, drop = FALSE)
+    y_name = gsub('\\().*$', '', formula[2]) # get the response variable name
+    y = data[,y_name]
+    return(list(y = y,
+                X = X))
+  }
+
+# When there is at least one random effect term in the formula
+if (IsThereRandomEffects == 'Yes') {
   parsedFormula = lFormula(formula = formula, data = data)
   y_name = gsub('\\().*$', '', parsedFormula$formula[2]) # get the response variable name
   y = data[,y_name]
@@ -173,8 +191,9 @@ MakeDesignMatrix <- function(formula, data){
     colnames(Z) = paste(colnames(Z), parsedFormula$reTrms$cnms[[1]], sep='')
     colnames(Z) = gsub('\\.*\\(Intercept\\)', names(parsedFormula$reTrms$cnms), colnames(Z))
     X_Z = as.data.frame(as.matrix(cbind(parsedFormula$X, Z)))
-
   }
-  return(list(y = y,
-              X = X_Z))
+}
+
+return(list(y = y,
+            X = X_Z))
 }
