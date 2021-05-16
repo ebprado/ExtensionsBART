@@ -152,7 +152,7 @@ MakeDesignMatrix <- function(formula, data){
     {parsedFormula = lFormula(formula = formula, data = data)
     y_name = gsub('\\().*$', '', parsedFormula$formula[2]) # get the response variable name
     y = data[,y_name]
-    Z = t(parsedFormula$reTrms$Zt) # design matrix for random effects
+    Z = t(as.matrix(parsedFormula$reTrms$Zt)) # design matrix for random effects
 
     # Number of random effect terms
     number_random_effect_terms = length(parsedFormula$reTrms$cnms)
