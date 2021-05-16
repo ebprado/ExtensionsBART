@@ -189,3 +189,47 @@ MakeDesignMatrix <- function(formula, data){
                 X = X))
   }
 }
+
+
+MakeDesignMatrixPredict <- function(formula, data){
+
+  aux1 = gsub("[^[:alnum:]]", ' ', formula[3]) # take the terms in the predictor and remove numbers and special characters
+  aux2 = sort(unlist(strsplit(aux1, ' ')), decreasing = TRUE)[1] # get the first non-empty character
+  new_formula = as.formula(paste(aux2, '~' ,formula[3])) # remove the response, as the new dataset don't have it
+
+  IsThereRandomEffects = try(
+    # When there is at least one random effect term in the formula
+    {parsedFormula = lFormula(formula = new_formula, data = data)
+    Z = t(as.matrix(parsedFormula$reTrms$Zt)) # design matrix for random effects
+
+    # Number of random effect terms
+    number_random_effect_terms = length(parsedFormula$reTrms$cnms)
+
+    # When there are more than one random effect term
+    if (number_random_effect_terms > 1){
+      aux_indx_ini = 1
+      aux_indx_end = 0
+      for (i in 1:number_random_effect_terms){
+        term = parsedFormula$reTrms$cnms[i]
+        term_name = names(term)
+        unique_values_cov = nrow(unique(data[,term_name]))
+        aux_indx_end = aux_indx_ini + unique_values_cov * length(term[[1]]) - 1
+        colnames(Z)[aux_indx_ini:aux_indx_end] = paste(colnames(Z)[aux_indx_ini:aux_indx_end], rep(parsedFormula$reTrms$cnms[[i]],unique_values_cov), sep='')
+        colnames(Z)[aux_indx_ini:aux_indx_end] = gsub('\\.*\\(Intercept\\)',term_name , colnames(Z)[aux_indx_ini:aux_indx_end])
+        aux_indx_ini = aux_indx_end + 1
+      }
+      X_Z = as.data.frame(as.matrix(cbind(parsedFormula$X, Z)))
+    } else {
+      colnames(Z) = paste(colnames(Z), parsedFormula$reTrms$cnms[[1]], sep='')
+      colnames(Z) = gsub('\\.*\\(Intercept\\)', names(parsedFormula$reTrms$cnms), colnames(Z))
+      X_Z = as.data.frame(as.matrix(cbind(parsedFormula$X, Z)))
+    }
+    return(list(X = X_Z))})
+
+  # When there is no random effect terms (only fixed effects)
+  if (is.na(IsThereRandomEffects[2])) {
+    X <- model.frame(formula = paste('~', formula[3]), data = data)
+    X <- makeModelMatrixFromDataFrame(X, drop = FALSE)
+    return(list(X = X))
+  }
+}

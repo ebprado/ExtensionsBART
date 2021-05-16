@@ -3,7 +3,7 @@ predict_semibart = function(object, newdata_x1, newdata_x2,
                          type = c('all', 'median', 'mean')) {
 
 
-  data_new = MakeDesignMatrix(object$formula, newdata_x1)
+  data_new = MakeDesignMatrixPredict(object$formula, newdata_x1)
   X1 = as.matrix(data_new$X) # matrix to be used in the linear predictor
   beta_hat = apply(object$beta_hat,2,mean)
 
