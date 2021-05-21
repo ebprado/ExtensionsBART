@@ -181,7 +181,7 @@ MakeDesignMatrix <- function(formula, data){
 
   # When there is no random effect terms (only fixed effects)
   if (is.na(IsThereRandomEffects[2])) {
-    X <- model.frame(formula = paste('~', formula[3]), data = data)
+    X <- model.matrix(formula, data = data)
     X <- makeModelMatrixFromDataFrame(X, drop = FALSE)
     y_name = gsub('\\().*$', '', formula[2]) # get the response variable name
     y = data[,y_name]
@@ -228,7 +228,7 @@ MakeDesignMatrixPredict <- function(formula, data){
 
   # When there is no random effect terms (only fixed effects)
   if (is.na(IsThereRandomEffects[2])) {
-    X <- model.frame(formula = paste('~', formula[3]), data = data)
+    X <- model.matrix(as.formula(paste('~', formula[3])), data = data)
     X <- makeModelMatrixFromDataFrame(X, drop = FALSE)
     return(list(X = X))
   }

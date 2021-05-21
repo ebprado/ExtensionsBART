@@ -1,6 +1,6 @@
 #' @export
 #' @importFrom mvtnorm 'rmvnorm'
-#' @importFrom stats 'rgamma' 'runif' 'dnorm' 'sd' 'rnorm' 'pnorm' 'aggregate' 'as.formula' 'model.frame'
+#' @importFrom stats 'rgamma' 'runif' 'dnorm' 'sd' 'rnorm' 'pnorm' 'aggregate' 'as.formula' 'model.matrix'
 #' @importFrom MCMCpack 'rdirichlet' 'riwish'
 #' @importFrom truncnorm 'rtruncnorm'
 #' @importFrom lme4 'lFormula'
@@ -39,8 +39,7 @@ semibart = function(formula,
                    sigma2_mu = 1,
                    nburn = 1000,
                    npost = 1000,
-                   nthin = 1,
-                   intercept = FALSE) {
+                   nthin = 1) {
 
   if (class(x1) != 'data.frame' || class(x2) != 'data.frame') {stop('X1 and X2 need to be data frames.')}
 
@@ -48,7 +47,7 @@ semibart = function(formula,
   data = MakeDesignMatrix(formula, x1)
   y = data$y
   x1 = as.matrix(data$X) # matrix to be used in the linear predictor
-  x2 = as.matrix(x2) # matrix to be used in the BART component
+  x2 = makeModelMatrixFromDataFrame(x2, drop = FALSE) # matrix to be used in the BART component
 
   colnames_x1 = colnames(x1)
   colnames_x2 = colnames(x2)
@@ -209,8 +208,8 @@ semibart = function(formula,
 
     cat('\n') # Make sure progress bar ends on a new line
 
-    if (intercept==FALSE) {beta_hat = beta_store*y_sd}
-    if (intercept==TRUE) {
+    if (colnames_x1[1]!="(Intercept)") {beta_hat = beta_store*y_sd}
+    if (colnames_x1[1]=="(Intercept)") {
       beta_hat = beta_store*y_sd
        beta_hat[,1] = beta_hat[,1] + y_mean
     }
