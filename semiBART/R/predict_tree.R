@@ -26,20 +26,18 @@ predict_semibart = function(object, newdata_x1, newdata_x2,
   }
 
   if (colnames(X1)[1] == '(Intercept)') {
-    all = X1%*%beta_hat + object$y_sd * y_hat_mat
-    mean = X1%*%beta_hat + object$y_sd * apply(y_hat_mat,2,'mean')
-    median = X1%*%beta_hat + object$y_sd * apply(y_hat_mat,2,'median')
+    # Sort out what to return
+    out = switch(type,
+                 all = X1%*%beta_hat + object$y_sd * y_hat_mat,
+                 mean = X1%*%beta_hat + object$y_sd * apply(y_hat_mat,2,'mean'),
+                 median = X1%*%beta_hat + object$y_sd * apply(y_hat_mat,2,'median'))
   } else {
-    all = X1%*%beta_hat + object$y_mean + object$y_sd * y_hat_mat
-    mean = X1%*%beta_hat + object$y_mean + object$y_sd * apply(y_hat_mat,2,'mean')
-    median = X1%*%beta_hat + object$y_mean + object$y_sd * apply(y_hat_mat,2,'median')
-  }
 
-  # Sort out what to return
-  out = switch(type,
-               all = all,
-               mean = mean,
-               median = median)
+    switch(type,
+           all = X1%*%beta_hat + object$y_mean + object$y_sd * y_hat_mat,
+           mean = X1%*%beta_hat + object$y_mean + object$y_sd * apply(y_hat_mat,2,'mean'),
+           median = X1%*%beta_hat + object$y_mean + object$y_sd * apply(y_hat_mat,2,'median'))
+  }
 
   return(out)
 
