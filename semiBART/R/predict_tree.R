@@ -25,7 +25,7 @@ predict_semibart = function(object, newdata_x1, newdata_x2,
                                     single_tree = length(curr_trees) == 1)
   }
 
-  if (colnames(X1)[1] == '"(Intercept)"') {
+  if (colnames(X1)[1] == '(Intercept)') {
     all = X1%*%beta_hat + object$y_sd * y_hat_mat
     mean = X1%*%beta_hat + object$y_sd * apply(y_hat_mat,2,'mean')
     median = X1%*%beta_hat + object$y_sd * apply(y_hat_mat,2,'median')
