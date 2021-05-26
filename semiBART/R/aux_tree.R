@@ -164,7 +164,7 @@ MakeDesignMatrix <- function(formula, data){
       for (i in 1:number_random_effect_terms){
         term = parsedFormula$reTrms$cnms[i]
         term_name = names(term)
-        unique_values_cov = nrow(unique(data[,term_name]))
+        unique_values_cov = length(unique(data[,term_name]))
         aux_indx_end = aux_indx_ini + unique_values_cov * length(term[[1]]) - 1
         colnames(Z)[aux_indx_ini:aux_indx_end] = paste(colnames(Z)[aux_indx_ini:aux_indx_end], rep(parsedFormula$reTrms$cnms[[i]],unique_values_cov), sep='')
         colnames(Z)[aux_indx_ini:aux_indx_end] = gsub('\\.*\\(Intercept\\)',term_name , colnames(Z)[aux_indx_ini:aux_indx_end])
