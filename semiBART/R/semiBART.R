@@ -303,6 +303,7 @@ cl_semibart = function(formula,
   V = diag(p1)
   v = p1
   beta_hat = rep(0, p1)
+  z = ifelse(y == 0, -3, 3)
 
   # Create a list of trees for the initial stump
   curr_trees = create_stump(num_trees = ntrees,
