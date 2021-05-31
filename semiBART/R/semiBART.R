@@ -227,7 +227,9 @@ semibart = function(formula,
               y_sd = y_sd,
               var_count_store = var_count_store,
               s = s_prob_store,
-              formula = formula))
+              formula = formula,
+              colnames.x1 = colnames_x1,
+              colnames.x2 = colnames_x2))
 
 } # End main function
 
@@ -430,6 +432,8 @@ cl_semibart = function(formula,
               ntrees = ntrees,
               var_count_store = var_count_store,
               s = s_prob_store,
-              formula = formula))
+              formula = formula,
+              colnames.x1 = colnames_x1,
+              colnames.x2 = colnames_x2))
 
 } # End main function
