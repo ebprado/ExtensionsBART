@@ -331,7 +331,7 @@ cl_semibart = function(formula,
     if((i > nburn) & ((i - nburn) %% nthin) == 0) {
       curr = (i - nburn)/nthin
       tree_store[[curr]] = curr_trees
-      y_hat_store[curr,] = y_hat
+      y_hat_store[curr,] = pnorm(y_hat)
       var_count_store[curr,] = var_count
       s_prob_store[curr,] = s
       beta_store[curr,] = beta_hat
@@ -409,7 +409,7 @@ cl_semibart = function(formula,
     } # End loop through trees
 
     # Updating the final predictions
-    y_hat = pnorm(yhat_linear + yhat_bart)
+    y_hat = yhat_linear + yhat_bart
 
     # Update z (latent variable)
     z = update_z(y, y_hat)
