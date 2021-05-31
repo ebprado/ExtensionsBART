@@ -422,7 +422,7 @@ cl_semibart = function(formula,
 
   return(list(trees = tree_store,
               y_hat = y_hat_store,
-              beta_hat = beta_hat,
+              beta_hat = beta_store,
               bart_hat = bart_store,
               npost = npost,
               nburn = nburn,
