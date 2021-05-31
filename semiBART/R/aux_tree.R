@@ -147,7 +147,7 @@ sample_move = function(curr_tree, i, nburn, common_vars){
 
 MakeDesignMatrix <- function(formula, data){
 
-  IsThereRandomEffects = try(
+  IsThereRandomEffects = try(silent = TRUE,
     # When there is at least one random effect term in the formula
     {parsedFormula = lFormula(formula = formula, data = data)
     y_name = gsub('\\().*$', '', parsedFormula$formula[2]) # get the response variable name
