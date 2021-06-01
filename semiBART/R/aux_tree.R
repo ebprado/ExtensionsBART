@@ -11,7 +11,7 @@
 # 6. update_s: full conditional of the vector of splitting probability.
 # 7. get_number_distinct_cov: given a tree, it returns the number of distinct covariates used to create its structure
 # 8. MakeDesignMatrix: it's a function that creates the design matrix for the linear based on the formula
-
+# 9. var_used_trees:
 # Fill_tree_details -------------------------------------------------------
 
 fill_tree_details = function(curr_tree, X) {
@@ -235,4 +235,26 @@ MakeDesignMatrixPredict <- function(formula, data){
     X <- makeModelMatrixFromDataFrame(X, drop = FALSE)
     return(list(X = X))
   }
+}
+
+#' @export
+var_used_trees = function(object) {
+
+  # Create holder for predicted values
+  n_its = object$npost
+  ntrees = object$ntrees
+  colnames_x2 = object$colnames.x2
+
+  # Get which covariates are used by each tree in each MCMC iteration
+  vars_trees = matrix(NA, nrow=n_its, ncol=ntrees)
+  for (i in 1:n_its){
+    for (j in 1:ntrees){
+      aux = object$trees[[i]][[j]]$tree_matrix[,'split_variable']
+      if(length(aux) > 1){
+        vars_trees[i,j] = paste(colnames_x2[unique(sort(aux[!is.na(aux)]))], collapse = ',')
+      }
+    }
+  }
+
+  return(data.frame(table(vars_trees)))
 }

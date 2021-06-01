@@ -365,14 +365,14 @@ cl_semibart = function(formula,
 
       # CURRENT TREE: compute the log of the marginalised likelihood + log of the tree prior
       l_old = tree_full_conditional(curr_trees[[j]],
-                                    z,
+                                    current_partial_residuals,
                                     sigma2,
                                     sigma2_mu) +
         get_tree_prior(curr_trees[[j]], alpha, beta, common_variables)
 
       # NEW TREE: compute the log of the marginalised likelihood + log of the tree prior
       l_new = tree_full_conditional(new_trees[[j]],
-                                    z,
+                                    current_partial_residuals,
                                     sigma2,
                                     sigma2_mu) +
         get_tree_prior(new_trees[[j]], alpha, beta, common_variables)
@@ -397,7 +397,7 @@ cl_semibart = function(formula,
 
       # Update mu whether tree accepted or not
       curr_trees[[j]] = simulate_mu(curr_trees[[j]],
-                                    z,
+                                    current_partial_residuals,
                                     sigma2,
                                     sigma2_mu)
       # Updating BART predictions
