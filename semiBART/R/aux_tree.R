@@ -11,7 +11,7 @@
 # 6. update_s: full conditional of the vector of splitting probability.
 # 7. get_number_distinct_cov: given a tree, it returns the number of distinct covariates used to create its structure
 # 8. MakeDesignMatrix: it's a function that creates the design matrix for the linear based on the formula
-# 9. var_used_trees:
+# 9. var_used_trees: create a data frame with the frequency of the covariates used in trees.
 # Fill_tree_details -------------------------------------------------------
 
 fill_tree_details = function(curr_tree, X) {
@@ -184,8 +184,14 @@ MakeDesignMatrix <- function(formula, data){
 
   # When there is no random effect terms (only fixed effects)
   if (is.na(IsThereRandomEffects[2])) {
-    X <- as.data.frame(model.matrix(formula, data = data))
-    X <- makeModelMatrixFromDataFrame(X, drop = FALSE)
+    termsFormula = terms(formula)
+    getIntercept = attr(termsFormula, 'intercept')
+    getCovariates = attr(termsFormula, 'term.labels')
+    if (getIntercept == 0) {
+      X <- makeModelMatrixFromDataFrame(data[,getCovariates], drop = FALSE)
+    } else {
+      X <- makeModelMatrixFromDataFrame(cbind(`(Intercept)` = 1, data[,getCovariates]), drop = FALSE)
+    }
     y_name = gsub('\\().*$', '', formula[2]) # get the response variable name
     y = data[,y_name]
     return(list(y = y,
@@ -231,8 +237,14 @@ MakeDesignMatrixPredict <- function(formula, data){
 
   # When there is no random effect terms (only fixed effects)
   if (is.na(IsThereRandomEffects[2])) {
-    X <- as.data.frame(model.matrix(as.formula(paste('~', formula[3])), data = data))
-    X <- makeModelMatrixFromDataFrame(X, drop = FALSE)
+    termsFormula = terms(formula)
+    getIntercept = attr(termsFormula, 'intercept')
+    getCovariates = attr(termsFormula, 'term.labels')
+    if (getIntercept == 0) {
+      X <- makeModelMatrixFromDataFrame(data[,getCovariates], drop = FALSE)
+    } else {
+      X <- makeModelMatrixFromDataFrame(cbind(`(Intercept)` = 1, data[,getCovariates]), drop = FALSE)
+    }
     return(list(X = X))
   }
 }

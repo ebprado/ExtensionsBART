@@ -1,6 +1,6 @@
 #' @export
 #' @importFrom mvtnorm 'rmvnorm'
-#' @importFrom stats 'rgamma' 'runif' 'dnorm' 'sd' 'rnorm' 'pnorm' 'aggregate' 'as.formula' 'model.matrix'
+#' @importFrom stats 'rgamma' 'runif' 'dnorm' 'sd' 'rnorm' 'pnorm' 'aggregate' 'as.formula' 'terms'
 #' @importFrom MCMCpack 'rdirichlet' 'riwish'
 #' @importFrom truncnorm 'rtruncnorm'
 #' @importFrom lme4 'lFormula'
