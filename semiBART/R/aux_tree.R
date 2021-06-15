@@ -190,7 +190,7 @@ MakeDesignMatrix <- function(formula, data){
     if (getIntercept == 0) {
       X <- makeModelMatrixFromDataFrame(data[,getCovariates], drop = FALSE)
     } else {
-      X <- makeModelMatrixFromDataFrame(cbind(`(Intercept)` = 1, data[,getCovariates]), drop = FALSE)
+      X <- makeModelMatrixFromDataFrame(as.data.frame(cbind(`(Intercept)` = 1, data[,getCovariates])), drop = FALSE)
     }
     y_name = gsub('\\().*$', '', formula[2]) # get the response variable name
     y = data[,y_name]
@@ -243,7 +243,7 @@ MakeDesignMatrixPredict <- function(formula, data){
     if (getIntercept == 0) {
       X <- makeModelMatrixFromDataFrame(data[,getCovariates], drop = FALSE)
     } else {
-      X <- makeModelMatrixFromDataFrame(cbind(`(Intercept)` = 1, data[,getCovariates]), drop = FALSE)
+      X <- makeModelMatrixFromDataFrame(as.data.frame(cbind(`(Intercept)` = 1, data[,getCovariates])), drop = FALSE)
     }
     return(list(X = X))
   }
