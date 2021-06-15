@@ -268,5 +268,5 @@ var_used_trees = function(object) {
     }
   }
 
-  return(data.frame(table(vars_trees)))
+  return(data.frame(vars_trees))
 }
