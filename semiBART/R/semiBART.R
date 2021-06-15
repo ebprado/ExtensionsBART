@@ -162,7 +162,7 @@ semibart = function(formula,
           get_tree_prior(new_trees[[j]], alpha, beta, common_variables)
 
         # Exponentiate the results above
-        a = exp(l_new - l_old)
+        if (type == 'stump') {a=1} else {a = exp(l_new - l_old)}
 
         if(a > runif(1)) {
           curr_trees[[j]] = new_trees[[j]]
