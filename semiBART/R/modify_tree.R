@@ -85,7 +85,7 @@ update_tree = function(y, # Target variable
                       prune = prune_tree(X, y, curr_tree),
                       change = change_tree(X, y, curr_tree, node_min_size, common_vars))
 
-    if (type == 'prune'){
+    if (type %in% c('prune', 'change')){
 
       vars_tree = new_tree$tree_matrix[,'split_variable'] # get the split variables
       vars_tree_no_NAs = unique(vars_tree[!is.na(vars_tree)]) # remove the NAs
