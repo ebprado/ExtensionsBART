@@ -250,7 +250,7 @@ MakeDesignMatrixPredict <- function(formula, data){
 }
 
 #' @export
-var_used_trees = function(object) {
+var_used_trees = function(object, raw = FALSE) {
 
   # Create holder for predicted values
   n_its = object$npost
@@ -267,6 +267,7 @@ var_used_trees = function(object) {
       }
     }
   }
+if (raw == TRUE) {return(data.frame(vars_trees))}
+if (raw == FALSE) {return(as.data.frame(table(vars_trees)))}
 
-  return(data.frame(vars_trees))
 }
