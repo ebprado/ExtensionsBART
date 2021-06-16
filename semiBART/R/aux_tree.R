@@ -131,15 +131,10 @@ get_number_distinct_cov <- function(tree){
   return(num_distinct_cov)
 }
 
-sample_move = function(curr_tree, i, nburn, common_vars){
-
-  vars_tree = curr_tree$tree_matrix[,'split_variable'] # get the split variables
-  vars_tree_no_NAs = unique(vars_tree[!is.na(vars_tree)]) # remove the NAs
+sample_move = function(curr_tree, i, nburn){
 
   if (nrow(curr_tree$tree_matrix) == 1 || i < max(floor(0.1*nburn), 10)) {
     type = 'grow'
-  } else if (all(vars_tree_no_NAs %in% common_vars) && length(vars_tree_no_NAs) == 1){
-    type = 'stump' # this condition can happen due to a previous prune step, but as soon as it happens, we set it to a stump
   } else {
     type = sample(c('grow', 'prune', 'change'), 1)
   }

@@ -136,7 +136,7 @@ semibart = function(formula,
         current_partial_residuals = y_scale - yhat_bart - yhat_linear + tree_fits_store[,j]
 
         # Propose a move (grow, prune, change, or swap)
-        type = sample_move(curr_trees[[j]], i, nburn, common_variables)
+        type = sample_move(curr_trees[[j]], i, nburn)
 
         # Generate a new tree based on the current
         new_trees[[j]] = update_tree(y = current_partial_residuals,
@@ -162,7 +162,7 @@ semibart = function(formula,
           get_tree_prior(new_trees[[j]], alpha, beta, common_variables)
 
         # Exponentiate the results above
-        if (type == 'stump') {a=1} else {a = exp(l_new - l_old)}
+        if (new_trees[[j]]$ForceStump == TRUE) {a=1} else {a = exp(l_new - l_old)}
 
         if(a > runif(1)) {
           curr_trees[[j]] = new_trees[[j]]
@@ -352,7 +352,7 @@ cl_semibart = function(formula,
       current_partial_residuals = z - yhat_bart - yhat_linear + tree_fits_store[,j]
 
       # Propose a move (grow, prune, change, or swap)
-      type = sample_move(curr_trees[[j]], i, nburn, common_variables)
+      type = sample_move(curr_trees[[j]], i, nburn)
 
       # Generate a new tree based on the current
       new_trees[[j]] = update_tree(y = z,
@@ -378,7 +378,7 @@ cl_semibart = function(formula,
         get_tree_prior(new_trees[[j]], alpha, beta, common_variables)
 
       # Exponentiate the results above
-      if (type == 'stump') {a=1} else {a = exp(l_new - l_old)}
+      if (new_trees[[j]]$ForceStump == TRUE) {a=1} else {a = exp(l_new - l_old)}
 
       if(a > runif(1)) {
         curr_trees[[j]] = new_trees[[j]]

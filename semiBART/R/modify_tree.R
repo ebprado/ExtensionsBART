@@ -56,6 +56,7 @@ create_stump = function(num_trees,
 
     # Set values for stump
     all_trees[[j]][[1]][1,] = c(1, NA, NA, NA, NA, NA, 0 , length(y))
+    all_trees[[j]]$ForceStump = FALSE
 
   } # End of loop through trees
 
@@ -70,8 +71,7 @@ update_tree = function(y, # Target variable
                        type = c('grow',   # Grow existing tree
                                 'prune',  # Prune existing tree
                                 'change', # Change existing tree - change split variable and value for an internal node
-                                'swap',   # Swap existing tree - swap splitting rules for two pairs of terminal nodes
-                                'stump'), # set a tree back to stump
+                                'swap'),  # Swap existing tree - swap splitting rules for two pairs of terminal nodes
                        curr_tree,         # The current set of trees (not required if type is stump)
                        node_min_size,     # The minimum size of a node to grow
                        s,                 # probability vector to be used during the growing process
@@ -83,9 +83,19 @@ update_tree = function(y, # Target variable
     new_tree = switch(type,
                       grow = grow_tree(X, y, curr_tree, node_min_size, s, common_vars),
                       prune = prune_tree(X, y, curr_tree),
-                      change = change_tree(X, y, curr_tree, node_min_size, common_vars),
-                      swap = swap_tree(X, y, curr_tree, node_min_size),
-                      stump = create_stump(1, y, X)[[1]])
+                      change = change_tree(X, y, curr_tree, node_min_size, common_vars))
+
+    if (type == 'prune'){
+
+      vars_tree = new_tree$tree_matrix[,'split_variable'] # get the split variables
+      vars_tree_no_NAs = unique(vars_tree[!is.na(vars_tree)]) # remove the NAs
+      # This can happen due to a previous prune step, but as soon as it happens, we set it to a stump
+      if (all(vars_tree_no_NAs %in% common_vars) && length(vars_tree_no_NAs) == 1){
+        new_tree = create_stump(1, y, X)[[1]]
+        new_tree$ForceStump = TRUE
+      }
+
+    }
 
   # Return the new tree
   return(new_tree)
@@ -261,6 +271,8 @@ prune_tree = function(X, y, curr_tree) {
     # Store the covariate name that was used in the splitting rule of the terminal nodes that were just pruned
     new_tree$var = var_pruned_nodes
 
+    # Create an auxiliary variable
+    new_tree$ForceStump = FALSE
   }
 
   # Return new_tree
