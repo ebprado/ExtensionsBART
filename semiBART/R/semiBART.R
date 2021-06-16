@@ -7,22 +7,22 @@
 #' @importFrom dbarts 'makeModelMatrixFromDataFrame'
 #'
 
-formula
-x1 # it needs to contain the response
-x2, # it doesn't need to contain the response
-sparse = FALSE,
-ntrees = 10,
-node_min_size = 5,
-alpha = 0.95,
-beta = 2,
-nu = 3,
-lambda = 0.1,
-mu_mu = 0,
-sigma2 = 1,
-sigma2_mu = 1,
-nburn = 1000,
-npost = 1000,
-nthin = 1
+# formula
+# x1 # it needs to contain the response
+# x2 # it doesn't need to contain the response
+# sparse = FALSE
+# ntrees = 10
+# node_min_size = 5
+# alpha = 0.95
+# beta = 2
+# nu = 3
+# lambda = 0.1
+# mu_mu = 0
+# sigma2 = 1
+# sigma2_mu = 1
+# nburn = 1000
+# npost = 1000
+# nthin = 1
 
 semibart = function(formula,
                    x1, # it needs to contain the response
