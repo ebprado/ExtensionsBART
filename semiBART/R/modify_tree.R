@@ -85,8 +85,6 @@ update_tree = function(y, # Target variable
                       prune = prune_tree(X, y, curr_tree),
                       change = change_tree(X, y, curr_tree, node_min_size, common_vars))
 
-    if (type %in% c('prune', 'change')){
-
       vars_tree = new_tree$tree_matrix[,'split_variable'] # get the split variables
       vars_tree_no_NAs = unique(vars_tree[!is.na(vars_tree)]) # remove the NAs
       # This can happen due to a previous prune step, but as soon as it happens, we set it to a stump
@@ -94,8 +92,6 @@ update_tree = function(y, # Target variable
         new_tree = create_stump(1, y, X)[[1]]
         new_tree$ForceStump = TRUE
       }
-
-    }
 
   # Return the new tree
   return(new_tree)
@@ -175,7 +171,8 @@ grow_tree = function(X, y, curr_tree, node_min_size, s, common_vars) {
         s_aux[split_variable] = 0 # set zero to the probability of the split variable that was just added in the tree, which is common to x1
         new_tree_double_grow = grow_tree(X, y, new_tree, node_min_size, s_aux, common_vars)
         new_tree_double_grow$var[2] = new_tree$var
-        save = new_tree$var
+        # save = new_tree$var
+        new_tree_double_grow$ForceStump = FALSE
         return(new_tree_double_grow)
       }
       bad_trees = FALSE
