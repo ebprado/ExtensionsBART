@@ -186,6 +186,10 @@ grow_tree = function(X, y, curr_tree, node_min_size, s, common_vars) {
       return(curr_tree)
       }
   }
+
+  # Create an auxiliary variable
+  new_tree$ForceStump = FALSE
+
   # Return new_tree
   return(new_tree)
 
@@ -270,10 +274,10 @@ prune_tree = function(X, y, curr_tree) {
 
     # Store the covariate name that was used in the splitting rule of the terminal nodes that were just pruned
     new_tree$var = var_pruned_nodes
-
-    # Create an auxiliary variable
-    new_tree$ForceStump = FALSE
   }
+
+  # Create an auxiliary variable
+  new_tree$ForceStump = FALSE
 
   # Return new_tree
   return(new_tree)
@@ -365,6 +369,9 @@ change_tree = function(X, y, curr_tree, node_min_size, common_vars) {
     }
 
   } # end of while loop
+
+  # Create an auxiliary variable
+  new_tree$ForceStump = FALSE
 
   # Return new_tree
   return(new_tree)
