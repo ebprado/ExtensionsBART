@@ -126,11 +126,14 @@ bart = function(   x,
                                       sigma2_mu) +
           get_tree_prior(new_trees[[j]], alpha, beta)
 
-        # Exponentiate the results above
-        a = exp(l_new - l_old)
+        # Exponentiate and multiply by the transition probabilities
 
-        if(a > runif(1)) {
-          curr_trees[[j]] = new_trees[[j]]
+        if(type == 'grow'){
+          a = exp(l_new - l_old)*ratio_grow(new_trees[[j]], curr_trees[[j]])
+        } else if(type == 'prune'){
+          a = exp(l_new - l_old)*ratio_prune(new_trees[[j]], curr_trees[[j]])
+        } else{
+          a = exp(l_new - l_old)
         }
 
         # Update mu whether tree accepted or not
@@ -174,8 +177,6 @@ bart = function(   x,
               ))
 
 } # End main function
-
-
 
 #' @export
 #' @importFrom mvtnorm 'rmvnorm'
