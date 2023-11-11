@@ -136,6 +136,10 @@ bart = function(   x,
           a = exp(l_new - l_old)
         }
 
+        if(a > runif(1)) {
+          curr_trees[[j]] = new_trees[[j]]
+        }
+
         # Update mu whether tree accepted or not
         curr_trees[[j]] = simulate_mu(curr_trees[[j]],
                                       current_partial_residuals,
